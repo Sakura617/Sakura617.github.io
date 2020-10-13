@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/Sakura617.github.io/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/Sakura617.github.io/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/Sakura617.github.io/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/Sakura617.github.io/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/Sakura617.github.io/css/main.css">
+
+
+<link rel="stylesheet" href="/Sakura617.github.io/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    hostname: new URL('http://github.com/Sakura617/Sakura617.github.io').hostname,
+    root: '/Sakura617.github.io/',
+    scheme: 'Gemini',
+    version: '7.7.1',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},
+    copycode: {"enable":true,"show_result":"default","style":null},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    comments: {"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":6,"unescape":false,"preload":false},
+    path: './public/search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}
+  };
+</script>
+
+  <meta name="description" content="摘要极端移动性出现频繁，然而基于信号强度设计的4G&#x2F;5G的移动性管理在极端情况下并不可靠，存在故障和策略冲突。本文设计了delay-Doppler域中基于movement的移动管理方法：REM(Reliable Extreme Mobility management)，REM通过跨带估计放宽了反馈，简化了可证明的无冲突策略并通过基于OTFS调制来稳定信令，具有较低的信令和延迟成本。 核心理念：客户">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Beyond 5G-Reliable Extreme Mobility Management">
+<meta property="og:url" content="http://github.com/Sakura617/Sakura617.github.io/2020/10/13/Beyond%205G-Reliable%20Extreme%20Mobility%20Management/index.html">
+<meta property="og:site_name" content="Sakura617&#39;s Blog">
+<meta property="og:description" content="摘要极端移动性出现频繁，然而基于信号强度设计的4G&#x2F;5G的移动性管理在极端情况下并不可靠，存在故障和策略冲突。本文设计了delay-Doppler域中基于movement的移动管理方法：REM(Reliable Extreme Mobility management)，REM通过跨带估计放宽了反馈，简化了可证明的无冲突策略并通过基于OTFS调制来稳定信令，具有较低的信令和延迟成本。 核心理念：客户">
+<meta property="og:locale">
+<meta property="og:image" content="https://pic.downk.cc/item/5f77f02e160a154a67f220da.png">
+<meta property="og:image" content="https://pic.downk.cc/item/5f77f66f160a154a67f3b6d9.png">
+<meta property="og:image" content="https://pic.downk.cc/item/5f783463160a154a6704a955.jpg">
+<meta property="og:image" content="https://pic.downk.cc/item/5f799508160a154a6754abd9.jpg">
+<meta property="og:image" content="https://pic.downk.cc/item/5f7994b7160a154a675497ea.jpg">
+<meta property="og:image" content="https://pic.downk.cc/item/5f799a3f160a154a6755d518.jpg">
+<meta property="og:image" content="https://pic.downk.cc/item/5f79c03d160a154a676559b4.jpg">
+<meta property="og:image" content="https://pic.downk.cc/item/5f79c2ba160a154a6765f051.jpg">
+<meta property="og:image" content="https://pic.downk.cc/item/5f79f46f160a154a67730a24.jpg">
+<meta property="article:published_time" content="2020-10-13T11:57:28.000Z">
+<meta property="article:modified_time" content="2020-10-13T13:04:23.927Z">
+<meta property="article:author" content="Sakura617">
+<meta property="article:tag" content="论文学习">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://pic.downk.cc/item/5f77f02e160a154a67f220da.png">
+
+<link rel="canonical" href="http://github.com/Sakura617/Sakura617.github.io/2020/10/13/Beyond%205G-Reliable%20Extreme%20Mobility%20Management/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true
+  };
+</script>
+
+  <title>Beyond 5G-Reliable Extreme Mobility Management | Sakura617's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <a href="https://github.com/Sakura617" class="github-corner" aria-label="View source on GitHub"><svg width="80" height="80" viewBox="0 0 250 250" style="fill:#151513; color:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+    
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/Sakura617.github.io/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Sakura617's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">Just do it</p>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/Sakura617.github.io/" rel="section"><i class="fa fa-fw fa-home"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/Sakura617.github.io/about/" rel="section"><i class="fa fa-fw fa-user"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/Sakura617.github.io/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/Sakura617.github.io/categories/" rel="section"><i class="fa fa-fw fa-th"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/Sakura617.github.io/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>Archives</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="Searching..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://github.com/Sakura617/Sakura617.github.io/2020/10/13/Beyond%205G-Reliable%20Extreme%20Mobility%20Management/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/Sakura617.github.io/images/avatar.jpg">
+      <meta itemprop="name" content="Sakura617">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Sakura617's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Beyond 5G-Reliable Extreme Mobility Management
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2020-10-13 19:57:28 / Modified: 21:04:23" itemprop="dateCreated datePublished" datetime="2020-10-13T19:57:28+08:00">2020-10-13</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/Sakura617.github.io/categories/%E8%AE%BA%E6%96%87%E5%AD%A6%E4%B9%A0/" itemprop="url" rel="index">
+                    <span itemprop="name">论文学习</span>
+                  </a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine: </span>
+    
+    <a title="valine" href="/Sakura617.github.io/2020/10/13/Beyond%205G-Reliable%20Extreme%20Mobility%20Management/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/Sakura617.github.io/2020/10/13/Beyond%205G-Reliable%20Extreme%20Mobility%20Management/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>5.3k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>5 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h1><p>极端移动性出现频繁，然而基于信号强度设计的4G/5G的移动性管理在极端情况下并不可靠，存在故障和策略冲突。本文设计了delay-Doppler域中基于movement的移动管理方法：REM(Reliable Extreme Mobility management)，REM通过跨带估计放宽了反馈，简化了可证明的无冲突策略并通过基于OTFS调制来稳定信令，具有较低的信令和延迟成本。</p>
+<p>核心理念：客户端移动比无线网更健壮、可预测，更适合在极端移动性下去驱动移动性管理</p>
+<h1 id="知识点"><a href="#知识点" class="headerlink" title="知识点"></a>知识点</h1><blockquote>
+<p><strong>4G/5G在极端移动性下不可靠原因</strong></p>
+</blockquote>
+<p>其设计是基于无线信号强度的。4G/5G移动性将无线信号强度作为输入，依靠客户端反馈进行触发，然后根据策略决定目标。这种设计对极端移动性中的多普勒频移所引起的剧烈无线动态变化敏感，这种动态变化会传播到移动性管理的所有阶段，导致触发反馈缓慢、决策时错过好的候选单元、执行时信号不可靠。运营商尝试通过主动策略来减轻故障，但是该方法放大了策略冲突，最终抵消了其缓解故障的能力。</p>
+<blockquote>
+<p><strong>多普勒效应</strong></p>
+</blockquote>
+<p>当声音，光和无线电波等振动源与观测者以相对速度V相对运动时，观测者所收到的振动频率与振动源所发出的频率有所不同</p>
+<p>信号源靠近观察者，连续波之间的到达时间降低，频率增加；信号源远离观察者，连续波之间的到达时间增加，频率降低</p>
+<blockquote>
+<p><strong>多普勒频移</strong></p>
+</blockquote>
+<p>由多普勒效应所形成的频率变化叫做多普勒频移，它与相对速度V成正比，与振动的频率成正比。</p>
+<p>fd为多普勒频移，theta为移动台方向与入射波方向的夹角；v是移动台的速度；c是电磁波传播速度c=3x10Km/s；f为载波频率。</p>
+<p>可以得出，用户移动方向与电磁波传播方向相同时，多普勒频移为正，反之；完全垂直时，没有多普勒频移</p>
+<p>推导过程：<br><a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_36976475/article/details/108321078?utm_medium=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-3.channel_param&amp;depth_1-utm_source=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-3.channel_param">https://blog.csdn.net/qq_36976475/article/details/108321078?utm_medium=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-3.channel_param&amp;depth_1-utm_source=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-3.channel_param</a></p>
+<img src="https://pic.downk.cc/item/5f77f02e160a154a67f220da.png" style="zoom:90%;" />
+
+<img src="https://pic.downk.cc/item/5f77f66f160a154a67f3b6d9.png" style="zoom:67%;" />
+
+<blockquote>
+<p><strong>多径衰落</strong></p>
+</blockquote>
+<p>接收机所接收到的信号是通过不同的直射、反射、折射等路径到达接收机。由于电波通过各个路径的距离不同，因而各条路径中发射波的到达时间、相位都不相同。不同相位的多个信号在接收端叠加，如果同相叠加则会使信号幅度增强，而反相叠加则会削弱信号幅度。这样，接收信号的幅度将会发生急剧变化，就会产生衰落。</p>
+<blockquote>
+<p><strong>OFDM正交频分复用</strong></p>
+</blockquote>
+<p>FDM/FDMA（频分复用/多址）技术其实是传统的技术，将较宽的频带分成若干较窄的子带（子载波）进行并行发送是最朴素的实现宽带传输的方法。但是为了避免各子载波之间的干扰，不得不在相邻的子载波之间保留较大的间隔（如图1(a)所示），这大大降低了频谱效率。因此，频谱效率更高的TDM/TDMA（时分复用/多址）和CDM/CDMA技术成为了无线通信的核心传输技术。但近几年，由于数字调制技术FFT（快速傅丽叶变换）的发展，使FDM技术有了革命性的变化。FFT允许将FDM的各个子载波重叠排列，同时保持子载波之间的正交性（以避免子载波之间干扰）。如图1(b)所示，部分重叠的子载波排列可以大大提高频谱效率，因为相同的带宽内可以容纳更多的子载波。</p>
+<p>OFDM技术优势：</p>
+<p>(1) 频谱效率高。由于FFT处理使各子载波可以部分重叠，理论上可以接近Nyquist极限。以OFDM为基础的多址技术OFDMA（正交频分多址）可以实现小区内各用户之间的正交性，从而有效避免用户间干扰。这使OFDM系统可以实现很高的小区容量。</p>
+<p>(2) 带宽扩展性强。由于OFDM系统的信号带宽取决于使用的子载波的数量，因此OFDM系统具有很好的带宽扩展性。小到几百KHz，大到几百MHz，都比较容易实现。尤其是随着移动通信宽带化（将由≤5MHz增加到最大20MHz以上），OFDM系统对大带宽的有效支持，成为其相对于单载波技术（如CDMA）的“决定性优势”。</p>
+<p>(3) 抗多径衰落。由于OFDM将宽带传输转化为很多子载波上的窄带传输，每个子载波上的信道可以看作水平衰落信道，从而大大降低了接收机均衡器的复杂度。相反，单载波信号的多径均衡的复杂度随着带宽的增大而急剧增加，很难支持较大的带宽（如20MHz以上）。</p>
+<p>(4) 频谱资源灵活分配。OFDM系统可以通过灵活的选择适合的子载波进行传输，来实现动态的频域资源分配，从而充分利用频率分集和多用户分集，以获得最佳的系统性能。</p>
+<p>(5) 实现MIMO技术较简单。由于每个OFDM子载波内的信道可看作水平衰落信道，多天线（MIMO）系统带来的额外复杂度可以控制在较低的水平（随天线数量呈线性增加）。相反，单载波MIMO系统的复杂度与天线数量和多径数量的乘积的幂成正比，很不利于MIMO技术的应用。</p>
+<p>相关资料：<br><a target="_blank" rel="noopener" href="https://blog.csdn.net/m0_46204224/article/details/106100857?utm_medium=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-4.channel_param&amp;depth_1-utm_source=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-4.channel_param">https://blog.csdn.net/m0_46204224/article/details/106100857?utm_medium=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-4.channel_param&amp;depth_1-utm_source=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-4.channel_param</a></p>
+<p><img src="https://pic.downk.cc/item/5f783463160a154a6704a955.jpg"></p>
+<blockquote>
+<p><strong>Why delay-Doppler domain</strong></p>
+</blockquote>
+<p>触发阶段：放松对反馈的依赖。无需对所有cell进行顺序测量，客户端只需策略一个cell然后对其他一个位置的cell进行跨带估计即可，加速了反馈速度而不会减少待测cell。</p>
+<p>决策阶段：简单无冲突策略。首先，通过跨带估计代替频率间测量，可绕过决策等待时机和频谱之间的折衷，因此不需要多阶段策略。其次，减少了对异构cell的共享多路径的配置，因此减少了冲突。</p>
+<p>执行阶段：稳定了信令。类似于4G/5G OFDM，我们可在延迟多普勒域中表示、调制和传输信号。与OFDM相比，延迟多普勒信号传输与缓慢变化的多径演进直接耦合。因此它将充分利用时频多样性，从而拥有更稳定的信道和更少的丢失/损坏。减轻因信号/反馈丢失或损坏而引起的故障。</p>
+<blockquote>
+<p><strong>OTFS正交时间频率扩展</strong></p>
+</blockquote>
+<p>移动通信的信道主要有两个特点：多径与多普勒。</p>
+<p>(1) 多径：发送信号可从多个路径到达接收机，各个路径的时延不一样。简单理解就是，一个信号存在多个时延的副本信号，这些副本信号叠加起来引起符号间干扰（时间扩散），在频域体现就是频域选择性。</p>
+<p>(2) 多普勒：接受机相对信源移动，造成接受信号产生频率扩散。简言之，本来发送频率为f1的信号，在接收端可能得到频率为f2的信号，在时域体现就是时间选择性，信道响应会随时间变化。</p>
+<p>在第四代通信技术中，OFDM可以很好地解决多径问题，主要思想为将高速的信息流转成并行的低速信息流，并将信道正交分割成若干的子信道，再将低速数据流加载到子信道上，每路数据近似经历平坦衰落。从时域理解，就是每路数据的符号周期大大延长，对信道的时延敏感性降低，符号间干扰也大大降低，当然前提在于各路低速信号叠加之后还能够被提取出来。但是，OFDM技术不能很好地解决高多普勒问题，因为需要在一个OFDM帧内假设信道不变，否则存在严重的子载波间干扰，影响系统性能。</p>
+<p>OTFS技术的创新在于将数据承载于时延多普勒域，并通过ISFFT变换将其转成时频域，这种扩展函数将每个OTFS符号铺满于整个时频域，之后的过程和OFDM别无二致，因此该技术可以视为OFDM前的一种预处理过程，与目前的4G系统兼容。最终得到结论：每个OTFS符号经历几乎相同的信道，从而获取全分集增益</p>
+<p>例如：</p>
+<img src="https://pic.downk.cc/item/5f799508160a154a6754abd9.jpg" style="zoom: 45%;" />
+
+<img src="https://pic.downk.cc/item/5f7994b7160a154a675497ea.jpg" style="zoom:50%;" />
+
+
+
+<blockquote>
+<p><strong>Frequency Diversity</strong></p>
+</blockquote>
+<p>允许在不同的载波频率上传输同一消息信号，为了使接收到的信号在统计上独立或至少不相关，载波频率的间隔必须大于无线电信道的相干带宽。相干带宽取决于信道的多径延迟扩展。</p>
+<p>该技术的局限性在于接收方接收所有这些信号的能力（需要多个接收方调谐到这些频率）。实际上在两个不同的频率上重复相同的消息信号并不常见，因为这会大大降低频谱效率。取而代之的是，信号分散在较大的带宽上，因此信号的一部分通过不同的频率分量进行传输。这种扩展可以通过不同的方式来完成，包括使用反向DFT进行多载波调制以及使用突发之间的广泛分离频率进行跳频。</p>
+<h1 id="贡献"><a href="#贡献" class="headerlink" title="贡献"></a>贡献</h1><ol>
+<li>本文针对极端移动性中的网络可靠性进行了实证研究。借助中国高铁的数据集，我们揭示了各种故障原因以及移动管理各个阶段出现的政策冲突； </li>
+<li>本文设计REM，这是针对4G，5G及更高的第一个基于移动的可靠的极端移动性管理。 作为一种在延迟-多普勒域中的信令覆盖，REM设计了基于SVD的跨带估计法去放宽反馈，简化可证明冲突自由的策略，并通过基于调度的OTFS调制来稳定信令;</li>
+<li>我们使用软件定义的无线电对REM进行原型制作，并从系统上评估REM的网络故障减少率、策略冲突解决和系统开销。</li>
+</ol>
+<h1 id="论文组织架构"><a href="#论文组织架构" class="headerlink" title="论文组织架构"></a>论文组织架构</h1><blockquote>
+<p><strong>摘要</strong></p>
+</blockquote>
+<blockquote>
+<p><strong>介绍整体工作+贡献</strong></p>
+</blockquote>
+<blockquote>
+<p><strong>现有问题</strong></p>
+</blockquote>
+<p>三个阶段的问题(提出问题、验证、解决思路)<br>以上问题同样影响5G+总结需要怎样的解决方案</p>
+<blockquote>
+<p><strong>简介REM、Delay-Doppler domain、为何选择在delay-Doppler domain中、REM路线图</strong></p>
+</blockquote>
+<blockquote>
+<p><strong>根据路线图对REM三部分进行详细介绍</strong></p>
+</blockquote>
+<p><strong>(1) Delay-Doppler Signaling Overlay</strong></p>
+<p>REM利用OTFS在delay-Doppler域中建立了一个位于OFDM之上的signaling overlay并通过自适应调度扩展了OTFS，让其能够实现OTFS信令与OFDM数据的共存，并用其减轻了执行过程中因信令丢失或损坏而导致的失败，而不用改变现有的4G/5G设计或影响基于OFDM的数据传输</p>
+<p>REM实现：利用4G/5G信令流量在调度及分发中始终优先于数据流量，REM为基于OTFS的信令流量分配了一个子网格，使其与给予OFDM的数据能够共存而无需修改4G/5G设计或增加延迟/频谱成本</p>
+<img src="https://pic.downk.cc/item/5f799a3f160a154a6755d518.jpg" style="zoom:50%;" />
+
+
+
+<p><strong>(2) Relaxed Reliance on Feedback</strong></p>
+<p>对每个基站只测量一个cell，从中提取multi-path文件(路径延迟、衰减、相位等)，将其映射到同一基站中的其他cell，然后在不进行测量的情况下估计这些cell的质量。这样serving cell无需等待所有反馈和触发间隔即可做出决定</p>
+<p>REM实现：</p>
+<img src="https://pic.downk.cc/item/5f79c03d160a154a676559b4.jpg" style="zoom:50%;" />
+
+<img src="https://pic.downk.cc/item/5f79c2ba160a154a6765f051.jpg" style="zoom:50%;" />
+
+
+
+<p><strong>(3) Simplified, Conflict-Free Policy</strong></p>
+<p>REM简化了切换策略，实现了高可靠性和可验证正确性。我们的目标是：(1)尽可能避免多阶段策略，而不丢失单元或延迟移交；(2)消除极端流动性中的策略冲突。而REM仍然为运营商保留了自定义策略的灵活性</p>
+<p>REM实现分为四步：</p>
+<p>​    a. 将接收信号强度替换为delay-Doppler信噪比。有助于稳定输入并简化所需事件</p>
+<p>​    b. 用跨频带估计替代多阶段策略</p>
+<p>​    c. 删除策略中不必要的事件</p>
+<p>​    d. 保留剩余策略。cell可能根据其他指标如优先级，流量负载和访问控制等来决定切换。 REM使它们保持不变，并为操作员保留了灵活性</p>
+<blockquote>
+<p><strong>REM三部分的具体实现</strong></p>
+</blockquote>
+<p>在运行OpenAirInterface软件蜂窝栈的Ettus USRP软件定义无线电上实现的，一个模拟客户端，另一个模拟基站。REM作为signaling overlay在客户端和基站中LTE物理层和无线资源控制协议(RRC)之间被实现，并向后兼容。</p>
+<blockquote>
+<p>评估：<strong>reliability</strong> in extreme mobility &amp; efficiency and overhead</p>
+</blockquote>
+<p><strong>数据集：</strong></p>
+<p>(1)细粒度HSR数据集：07/2019-08/2019的中国高铁数据集，北京-太原，用中国电信在小米8手机中运行Skype视频通话，再用MobileInsight收集全栈4G LTE信令信息(PHY, MAC, RLC, RRC)</p>
+<p>(2)粗粒度HSR数据集：开源数据集，北京-上海，用于大规模检测。此数据集仅包含RRC消息，因此缺少细粒度的OFDM信道信息。</p>
+<p>(3)low mobility数据集：在洛杉矶高速路上使用MobileInsight采集</p>
+<p><strong>评估reliability in extreme mobility：</strong></p>
+<p>总体、触发阶段、决策阶段、执行阶段、coverage hole、有利于应用程序的数据传输</p>
+<p><strong>评估efficiency and overhead：</strong></p>
+<p>稳定delay-Doppler domain的信令、放宽反馈、简化的无冲突策略</p>
+<blockquote>
+<p><strong>Discussion</strong></p>
+</blockquote>
+<p>讨论了coverage hole、数据传输速度、在物联网边缘设备上的应用</p>
+<blockquote>
+<p><strong>相关工作</strong></p>
+</blockquote>
+<blockquote>
+<p><strong>总结</strong></p>
+</blockquote>
+<h1 id="不懂的地方"><a href="#不懂的地方" class="headerlink" title="不懂的地方"></a>不懂的地方</h1><p><strong>1. Delay-Doppler domain</strong></p>
+<p><strong>2. 表1</strong></p>
+<img src="https://pic.downk.cc/item/5f79f46f160a154a67730a24.jpg" style="zoom:55%;" />
+
+<p><strong>3. REM’s cross-band estimation数学推导</strong></p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div></div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    Donate
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/Sakura617.github.io/images/wechatpay.png" alt="Sakura617 WeChat Pay">
+        <p>WeChat Pay</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/Sakura617.github.io/images/alipay.png" alt="Sakura617 Alipay">
+        <p>Alipay</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/Sakura617.github.io/tags/%E8%AE%BA%E6%96%87%E5%AD%A6%E4%B9%A0/" rel="tag"># 论文学习</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/Sakura617.github.io/2020/10/12/hello-world/" rel="prev" title="Hello World">
+      <i class="fa fa-chevron-left"></i> Hello World
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/Sakura617.github.io/2020/10/13/MobileInsight-Extracting-and-Analyzing-Cellular-Network-Information-on-Smartphones/" rel="next" title="MobileInsight-Extracting and Analyzing Cellular Network Information on Smartphones">
+      MobileInsight-Extracting and Analyzing Cellular Network Information on Smartphones <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let activeClass = CONFIG.comments.activeClass;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%91%98%E8%A6%81"><span class="nav-text">摘要</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%9F%A5%E8%AF%86%E7%82%B9"><span class="nav-text">知识点</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%B4%A1%E7%8C%AE"><span class="nav-text">贡献</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%AE%BA%E6%96%87%E7%BB%84%E7%BB%87%E6%9E%B6%E6%9E%84"><span class="nav-text">论文组织架构</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%B8%8D%E6%87%82%E7%9A%84%E5%9C%B0%E6%96%B9"><span class="nav-text">不懂的地方</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Sakura617"
+      src="/Sakura617.github.io/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Sakura617</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/Sakura617.github.io/archives/">
+        
+          <span class="site-state-item-count">3</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/Sakura617.github.io/categories/">
+          
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/Sakura617.github.io/tags/">
+          
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Sakura617</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+      <span class="post-meta-item-text">Symbols count total: </span>
+    <span title="Symbols count total">11k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">Reading time total &asymp;</span>
+    <span title="Reading time total">10 mins.</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> v5.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">Theme – <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.7.1
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/Sakura617.github.io/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/Sakura617.github.io/lib/velocity/velocity.min.js"></script>
+  <script src="/Sakura617.github.io/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/Sakura617.github.io/js/utils.js"></script>
+
+<script src="/Sakura617.github.io/js/motion.js"></script>
+
+
+<script src="/Sakura617.github.io/js/schemes/pisces.js"></script>
+
+
+<script src="/Sakura617.github.io/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/Sakura617.github.io/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el: '#valine-comments',
+      verify: false,
+      notify: false,
+      appId: 'nw4lnzsA5lvjmvRpJiPAlKq5-gzGzoHsz',
+      appKey: 'cS2cEpuserM2Cev289mU19Qb',
+      placeholder: "Just go go",
+      avatar: 'mm',
+      meta: guest,
+      pageSize: '10' || 10,
+      visitor: false,
+      lang: '' || 'zh-cn',
+      path: location.pathname,
+      recordIP: false,
+      serverURLs: ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

@@ -1,6 +1,264 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>Beyond 5G-Reliable Extreme Mobility Management</title>
+    <url>/Sakura617.github.io/2020/10/13/Beyond%205G-Reliable%20Extreme%20Mobility%20Management/</url>
+    <content><![CDATA[<h1 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h1><p>极端移动性出现频繁，然而基于信号强度设计的4G/5G的移动性管理在极端情况下并不可靠，存在故障和策略冲突。本文设计了delay-Doppler域中基于movement的移动管理方法：REM(Reliable Extreme Mobility management)，REM通过跨带估计放宽了反馈，简化了可证明的无冲突策略并通过基于OTFS调制来稳定信令，具有较低的信令和延迟成本。</p>
+<p>核心理念：客户端移动比无线网更健壮、可预测，更适合在极端移动性下去驱动移动性管理</p>
+<h1 id="知识点"><a href="#知识点" class="headerlink" title="知识点"></a>知识点</h1><blockquote>
+<p><strong>4G/5G在极端移动性下不可靠原因</strong></p>
+</blockquote>
+<p>其设计是基于无线信号强度的。4G/5G移动性将无线信号强度作为输入，依靠客户端反馈进行触发，然后根据策略决定目标。这种设计对极端移动性中的多普勒频移所引起的剧烈无线动态变化敏感，这种动态变化会传播到移动性管理的所有阶段，导致触发反馈缓慢、决策时错过好的候选单元、执行时信号不可靠。运营商尝试通过主动策略来减轻故障，但是该方法放大了策略冲突，最终抵消了其缓解故障的能力。</p>
+<blockquote>
+<p><strong>多普勒效应</strong></p>
+</blockquote>
+<p>当声音，光和无线电波等振动源与观测者以相对速度V相对运动时，观测者所收到的振动频率与振动源所发出的频率有所不同</p>
+<p>信号源靠近观察者，连续波之间的到达时间降低，频率增加；信号源远离观察者，连续波之间的到达时间增加，频率降低</p>
+<blockquote>
+<p><strong>多普勒频移</strong></p>
+</blockquote>
+<p>由多普勒效应所形成的频率变化叫做多普勒频移，它与相对速度V成正比，与振动的频率成正比。</p>
+<p>fd为多普勒频移，theta为移动台方向与入射波方向的夹角；v是移动台的速度；c是电磁波传播速度c=3x10Km/s；f为载波频率。</p>
+<p>可以得出，用户移动方向与电磁波传播方向相同时，多普勒频移为正，反之；完全垂直时，没有多普勒频移</p>
+<p>推导过程：<br><a href="https://blog.csdn.net/qq_36976475/article/details/108321078?utm_medium=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-3.channel_param&amp;depth_1-utm_source=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-3.channel_param">https://blog.csdn.net/qq_36976475/article/details/108321078?utm_medium=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-3.channel_param&amp;depth_1-utm_source=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-3.channel_param</a></p>
+<img src="https://pic.downk.cc/item/5f77f02e160a154a67f220da.png" style="zoom:90%;" />
+
+<img src="https://pic.downk.cc/item/5f77f66f160a154a67f3b6d9.png" style="zoom:67%;" />
+
+<blockquote>
+<p><strong>多径衰落</strong></p>
+</blockquote>
+<p>接收机所接收到的信号是通过不同的直射、反射、折射等路径到达接收机。由于电波通过各个路径的距离不同，因而各条路径中发射波的到达时间、相位都不相同。不同相位的多个信号在接收端叠加，如果同相叠加则会使信号幅度增强，而反相叠加则会削弱信号幅度。这样，接收信号的幅度将会发生急剧变化，就会产生衰落。</p>
+<blockquote>
+<p><strong>OFDM正交频分复用</strong></p>
+</blockquote>
+<p>FDM/FDMA（频分复用/多址）技术其实是传统的技术，将较宽的频带分成若干较窄的子带（子载波）进行并行发送是最朴素的实现宽带传输的方法。但是为了避免各子载波之间的干扰，不得不在相邻的子载波之间保留较大的间隔（如图1(a)所示），这大大降低了频谱效率。因此，频谱效率更高的TDM/TDMA（时分复用/多址）和CDM/CDMA技术成为了无线通信的核心传输技术。但近几年，由于数字调制技术FFT（快速傅丽叶变换）的发展，使FDM技术有了革命性的变化。FFT允许将FDM的各个子载波重叠排列，同时保持子载波之间的正交性（以避免子载波之间干扰）。如图1(b)所示，部分重叠的子载波排列可以大大提高频谱效率，因为相同的带宽内可以容纳更多的子载波。</p>
+<p>OFDM技术优势：</p>
+<p>(1) 频谱效率高。由于FFT处理使各子载波可以部分重叠，理论上可以接近Nyquist极限。以OFDM为基础的多址技术OFDMA（正交频分多址）可以实现小区内各用户之间的正交性，从而有效避免用户间干扰。这使OFDM系统可以实现很高的小区容量。</p>
+<p>(2) 带宽扩展性强。由于OFDM系统的信号带宽取决于使用的子载波的数量，因此OFDM系统具有很好的带宽扩展性。小到几百KHz，大到几百MHz，都比较容易实现。尤其是随着移动通信宽带化（将由≤5MHz增加到最大20MHz以上），OFDM系统对大带宽的有效支持，成为其相对于单载波技术（如CDMA）的“决定性优势”。</p>
+<p>(3) 抗多径衰落。由于OFDM将宽带传输转化为很多子载波上的窄带传输，每个子载波上的信道可以看作水平衰落信道，从而大大降低了接收机均衡器的复杂度。相反，单载波信号的多径均衡的复杂度随着带宽的增大而急剧增加，很难支持较大的带宽（如20MHz以上）。</p>
+<p>(4) 频谱资源灵活分配。OFDM系统可以通过灵活的选择适合的子载波进行传输，来实现动态的频域资源分配，从而充分利用频率分集和多用户分集，以获得最佳的系统性能。</p>
+<p>(5) 实现MIMO技术较简单。由于每个OFDM子载波内的信道可看作水平衰落信道，多天线（MIMO）系统带来的额外复杂度可以控制在较低的水平（随天线数量呈线性增加）。相反，单载波MIMO系统的复杂度与天线数量和多径数量的乘积的幂成正比，很不利于MIMO技术的应用。</p>
+<p>相关资料：<br><a href="https://blog.csdn.net/m0_46204224/article/details/106100857?utm_medium=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-4.channel_param&amp;depth_1-utm_source=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-4.channel_param">https://blog.csdn.net/m0_46204224/article/details/106100857?utm_medium=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-4.channel_param&amp;depth_1-utm_source=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-4.channel_param</a></p>
+<p><img src="https://pic.downk.cc/item/5f783463160a154a6704a955.jpg"></p>
+<blockquote>
+<p><strong>Why delay-Doppler domain</strong></p>
+</blockquote>
+<p>触发阶段：放松对反馈的依赖。无需对所有cell进行顺序测量，客户端只需策略一个cell然后对其他一个位置的cell进行跨带估计即可，加速了反馈速度而不会减少待测cell。</p>
+<p>决策阶段：简单无冲突策略。首先，通过跨带估计代替频率间测量，可绕过决策等待时机和频谱之间的折衷，因此不需要多阶段策略。其次，减少了对异构cell的共享多路径的配置，因此减少了冲突。</p>
+<p>执行阶段：稳定了信令。类似于4G/5G OFDM，我们可在延迟多普勒域中表示、调制和传输信号。与OFDM相比，延迟多普勒信号传输与缓慢变化的多径演进直接耦合。因此它将充分利用时频多样性，从而拥有更稳定的信道和更少的丢失/损坏。减轻因信号/反馈丢失或损坏而引起的故障。</p>
+<blockquote>
+<p><strong>OTFS正交时间频率扩展</strong></p>
+</blockquote>
+<p>移动通信的信道主要有两个特点：多径与多普勒。</p>
+<p>(1) 多径：发送信号可从多个路径到达接收机，各个路径的时延不一样。简单理解就是，一个信号存在多个时延的副本信号，这些副本信号叠加起来引起符号间干扰（时间扩散），在频域体现就是频域选择性。</p>
+<p>(2) 多普勒：接受机相对信源移动，造成接受信号产生频率扩散。简言之，本来发送频率为f1的信号，在接收端可能得到频率为f2的信号，在时域体现就是时间选择性，信道响应会随时间变化。</p>
+<p>在第四代通信技术中，OFDM可以很好地解决多径问题，主要思想为将高速的信息流转成并行的低速信息流，并将信道正交分割成若干的子信道，再将低速数据流加载到子信道上，每路数据近似经历平坦衰落。从时域理解，就是每路数据的符号周期大大延长，对信道的时延敏感性降低，符号间干扰也大大降低，当然前提在于各路低速信号叠加之后还能够被提取出来。但是，OFDM技术不能很好地解决高多普勒问题，因为需要在一个OFDM帧内假设信道不变，否则存在严重的子载波间干扰，影响系统性能。</p>
+<p>OTFS技术的创新在于将数据承载于时延多普勒域，并通过ISFFT变换将其转成时频域，这种扩展函数将每个OTFS符号铺满于整个时频域，之后的过程和OFDM别无二致，因此该技术可以视为OFDM前的一种预处理过程，与目前的4G系统兼容。最终得到结论：每个OTFS符号经历几乎相同的信道，从而获取全分集增益</p>
+<p>例如：</p>
+<img src="https://pic.downk.cc/item/5f799508160a154a6754abd9.jpg" style="zoom: 45%;" />
+
+<img src="https://pic.downk.cc/item/5f7994b7160a154a675497ea.jpg" style="zoom:50%;" />
+
+
+
+<blockquote>
+<p><strong>Frequency Diversity</strong></p>
+</blockquote>
+<p>允许在不同的载波频率上传输同一消息信号，为了使接收到的信号在统计上独立或至少不相关，载波频率的间隔必须大于无线电信道的相干带宽。相干带宽取决于信道的多径延迟扩展。</p>
+<p>该技术的局限性在于接收方接收所有这些信号的能力（需要多个接收方调谐到这些频率）。实际上在两个不同的频率上重复相同的消息信号并不常见，因为这会大大降低频谱效率。取而代之的是，信号分散在较大的带宽上，因此信号的一部分通过不同的频率分量进行传输。这种扩展可以通过不同的方式来完成，包括使用反向DFT进行多载波调制以及使用突发之间的广泛分离频率进行跳频。</p>
+<h1 id="贡献"><a href="#贡献" class="headerlink" title="贡献"></a>贡献</h1><ol>
+<li>本文针对极端移动性中的网络可靠性进行了实证研究。借助中国高铁的数据集，我们揭示了各种故障原因以及移动管理各个阶段出现的政策冲突； </li>
+<li>本文设计REM，这是针对4G，5G及更高的第一个基于移动的可靠的极端移动性管理。 作为一种在延迟-多普勒域中的信令覆盖，REM设计了基于SVD的跨带估计法去放宽反馈，简化可证明冲突自由的策略，并通过基于调度的OTFS调制来稳定信令;</li>
+<li>我们使用软件定义的无线电对REM进行原型制作，并从系统上评估REM的网络故障减少率、策略冲突解决和系统开销。</li>
+</ol>
+<h1 id="论文组织架构"><a href="#论文组织架构" class="headerlink" title="论文组织架构"></a>论文组织架构</h1><blockquote>
+<p><strong>摘要</strong></p>
+</blockquote>
+<blockquote>
+<p><strong>介绍整体工作+贡献</strong></p>
+</blockquote>
+<blockquote>
+<p><strong>现有问题</strong></p>
+</blockquote>
+<p>三个阶段的问题(提出问题、验证、解决思路)<br>以上问题同样影响5G+总结需要怎样的解决方案</p>
+<blockquote>
+<p><strong>简介REM、Delay-Doppler domain、为何选择在delay-Doppler domain中、REM路线图</strong></p>
+</blockquote>
+<blockquote>
+<p><strong>根据路线图对REM三部分进行详细介绍</strong></p>
+</blockquote>
+<p><strong>(1) Delay-Doppler Signaling Overlay</strong></p>
+<p>REM利用OTFS在delay-Doppler域中建立了一个位于OFDM之上的signaling overlay并通过自适应调度扩展了OTFS，让其能够实现OTFS信令与OFDM数据的共存，并用其减轻了执行过程中因信令丢失或损坏而导致的失败，而不用改变现有的4G/5G设计或影响基于OFDM的数据传输</p>
+<p>REM实现：利用4G/5G信令流量在调度及分发中始终优先于数据流量，REM为基于OTFS的信令流量分配了一个子网格，使其与给予OFDM的数据能够共存而无需修改4G/5G设计或增加延迟/频谱成本</p>
+<img src="https://pic.downk.cc/item/5f799a3f160a154a6755d518.jpg" style="zoom:50%;" />
+
+
+
+<p><strong>(2) Relaxed Reliance on Feedback</strong></p>
+<p>对每个基站只测量一个cell，从中提取multi-path文件(路径延迟、衰减、相位等)，将其映射到同一基站中的其他cell，然后在不进行测量的情况下估计这些cell的质量。这样serving cell无需等待所有反馈和触发间隔即可做出决定</p>
+<p>REM实现：</p>
+<img src="https://pic.downk.cc/item/5f79c03d160a154a676559b4.jpg" style="zoom:50%;" />
+
+<img src="https://pic.downk.cc/item/5f79c2ba160a154a6765f051.jpg" style="zoom:50%;" />
+
+
+
+<p><strong>(3) Simplified, Conflict-Free Policy</strong></p>
+<p>REM简化了切换策略，实现了高可靠性和可验证正确性。我们的目标是：(1)尽可能避免多阶段策略，而不丢失单元或延迟移交；(2)消除极端流动性中的策略冲突。而REM仍然为运营商保留了自定义策略的灵活性</p>
+<p>REM实现分为四步：</p>
+<p>​    a. 将接收信号强度替换为delay-Doppler信噪比。有助于稳定输入并简化所需事件</p>
+<p>​    b. 用跨频带估计替代多阶段策略</p>
+<p>​    c. 删除策略中不必要的事件</p>
+<p>​    d. 保留剩余策略。cell可能根据其他指标如优先级，流量负载和访问控制等来决定切换。 REM使它们保持不变，并为操作员保留了灵活性</p>
+<blockquote>
+<p><strong>REM三部分的具体实现</strong></p>
+</blockquote>
+<p>在运行OpenAirInterface软件蜂窝栈的Ettus USRP软件定义无线电上实现的，一个模拟客户端，另一个模拟基站。REM作为signaling overlay在客户端和基站中LTE物理层和无线资源控制协议(RRC)之间被实现，并向后兼容。</p>
+<blockquote>
+<p>评估：<strong>reliability</strong> in extreme mobility &amp; efficiency and overhead</p>
+</blockquote>
+<p><strong>数据集：</strong></p>
+<p>(1)细粒度HSR数据集：07/2019-08/2019的中国高铁数据集，北京-太原，用中国电信在小米8手机中运行Skype视频通话，再用MobileInsight收集全栈4G LTE信令信息(PHY, MAC, RLC, RRC)</p>
+<p>(2)粗粒度HSR数据集：开源数据集，北京-上海，用于大规模检测。此数据集仅包含RRC消息，因此缺少细粒度的OFDM信道信息。</p>
+<p>(3)low mobility数据集：在洛杉矶高速路上使用MobileInsight采集</p>
+<p><strong>评估reliability in extreme mobility：</strong></p>
+<p>总体、触发阶段、决策阶段、执行阶段、coverage hole、有利于应用程序的数据传输</p>
+<p><strong>评估efficiency and overhead：</strong></p>
+<p>稳定delay-Doppler domain的信令、放宽反馈、简化的无冲突策略</p>
+<blockquote>
+<p><strong>Discussion</strong></p>
+</blockquote>
+<p>讨论了coverage hole、数据传输速度、在物联网边缘设备上的应用</p>
+<blockquote>
+<p><strong>相关工作</strong></p>
+</blockquote>
+<blockquote>
+<p><strong>总结</strong></p>
+</blockquote>
+<h1 id="不懂的地方"><a href="#不懂的地方" class="headerlink" title="不懂的地方"></a>不懂的地方</h1><p><strong>1. Delay-Doppler domain</strong></p>
+<p><strong>2. 表1</strong></p>
+<img src="https://pic.downk.cc/item/5f79f46f160a154a67730a24.jpg" style="zoom:55%;" />
+
+<p><strong>3. REM’s cross-band estimation数学推导</strong></p>
+]]></content>
+      <categories>
+        <category>论文学习</category>
+      </categories>
+      <tags>
+        <tag>论文学习</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>MobileInsight-Extracting and Analyzing Cellular Network Information on Smartphones</title>
+    <url>/Sakura617.github.io/2020/10/13/MobileInsight-Extracting-and-Analyzing-Cellular-Network-Information-on-Smartphones/</url>
+    <content><![CDATA[<h2 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h2><p>本文设计并实现了MobileInsight这一软件工具，能够收集、分析和利用蜂窝网络运行时的网络信息。MobileInsight运行在商用的现成的手机上，无需额外的硬件或需要运营商提供额外支持。</p>
+<p>直接从侧信道中提取信令和/或低层消息到3G/4G硬件接口，解码协议消息，并通过分析器推断协议运行时的状态动态和决策逻辑。</p>
+<p>MobileInsight还提供了API以供开发人员和研究者能够访问其移动应用程序的底层网络信息。本文举了三个例子去说明MobileInsight是如何应用于蜂窝网络研究的(故障诊断、性能提升、安全漏洞检测，能够推断根本原因，并提出修复建议)。</p>
+<h2 id="MobileInsight三特点"><a href="#MobileInsight三特点" class="headerlink" title="MobileInsight三特点"></a>MobileInsight三特点</h2><p>可使用商用的现成设备而无需额外硬件支持即可收集运行时operation traces</p>
+<p>在给定数据跟踪的情况下，能够提供分析以提取日常使用设置和异常故障情况下的动态协议行为</p>
+<p>提供用于构建应用程序的简单API，并且该框架易于扩展</p>
+<h2 id="贡献"><a href="#贡献" class="headerlink" title="贡献"></a>贡献</h2><p>提出了MobileInsight这一设备内软件工具用于监视、分析和利用COTS智能手机上实时的蜂窝协议信</p>
+<p>针对3G/4G协议，设计了用于采集信令信息的侧信道技术，还设计了分析协议状态动态和操作逻辑的推理技术</p>
+<p>进行了广泛的测试来评估其有效性，并用了3个例子去证明其广泛应用的潜力</p>
+<h2 id="论文组织架构"><a href="#论文组织架构" class="headerlink" title="论文组织架构"></a>论文组织架构</h2><h3 id="摘要-1"><a href="#摘要-1" class="headerlink" title="摘要"></a>摘要</h3><h3 id="介绍整体工作-贡献"><a href="#介绍整体工作-贡献" class="headerlink" title="介绍整体工作+贡献"></a>介绍整体工作+贡献</h3><h3 id="讲解设备内蜂窝网络协议栈、设备内通过API访问蜂窝网络信息的局限"><a href="#讲解设备内蜂窝网络协议栈、设备内通过API访问蜂窝网络信息的局限" class="headerlink" title="讲解设备内蜂窝网络协议栈、设备内通过API访问蜂窝网络信息的局限"></a>讲解设备内蜂窝网络协议栈、设备内通过API访问蜂窝网络信息的局限</h3><h3 id="介绍MobileInsight目标-组成"><a href="#介绍MobileInsight目标-组成" class="headerlink" title="介绍MobileInsight目标+组成"></a>介绍MobileInsight目标+组成</h3><blockquote>
+<p><strong>三个具体目标：</strong></p>
+</blockquote>
+<p>(1) 在设备部署</p>
+<p>(2) 协议分析。除了对协议消息进行归档，MOBILEINSIGHT还应该补充对标准化蜂窝协议的分析，包括它们的状态动态和操作逻辑。理想情况下，分析是在运行时进行的，以便它可以用于各种用途，比如性能改进和故障诊断。</p>
+<p>(3) 细粒度、覆盖面广。应该为运行时协议操作提供细粒度的信息，支持跨层、控制和数据层面的协议。</p>
+<blockquote>
+<p><strong>MobileInsight组成分为两部分：</strong></p>
+</blockquote>
+<p>(1) Monitor</p>
+<p>在运行时将来自蜂窝接口的原始蜂窝日志公开给设备用户空间，然后将其解析为协议消息并提取其携带的信息元素。构建了一个可扩展的模块化框架，其中每个解析器都基于协议工作。 解析的消息然后被馈送到Analyzer。</p>
+<p>(2) Analyzer</p>
+<p>Analyzer根据提取的消息揭示协议动态和操作逻辑。 根据观察到的消息和预期的行为模型，Analyzer可推断出协议状态、状态转换的触发条件以及协议采取的行动。 而且可推断出某些使用操作员定义的策略和配置的特定协议操作逻辑（例如切换）。 提供了每个协议的内置抽象，并允许移动移动OS/app开发人员自定义其Analyzer。</p>
+<img src="https://pic.downk.cc/item/5f7c9917e0d741f96c343cd6.jpg" style="zoom:67%;" />
+
+<h3 id="根据MobileInsight组成，先讲Monitor部分"><a href="#根据MobileInsight组成，先讲Monitor部分" class="headerlink" title="根据MobileInsight组成，先讲Monitor部分"></a>根据MobileInsight组成，先讲Monitor部分</h3><blockquote>
+<p><strong>如何将原始蜂窝信息从硬件暴露给软件？从侧信道公开原始日志</strong></p>
+</blockquote>
+<p> 芯片组的基于USB的诊断模式可将蜂窝接口暴露于USB端口(从诊断驱动程序的源码中了解)。蜂窝接口将自身映射于OS中的虚拟设备，该虚拟设备将所有原始蜂窝消息公开为二进制流，当USB连接到外部收集器时，OS将虚拟设备与USB端口进行绑定，外部收集器即可从硬件接口获取蜂窝消息。</p>
+<p>MobileInsight模拟了一个外部记录器，向虚拟设备发送指令，从虚拟设备中提取十六进制日志流并将其传递给设备内的消息解析器。</p>
+<blockquote>
+<p><strong>考虑到协议消息类型的丰富性和相互依赖性，如何将信息解码为有用消息？</strong></p>
+</blockquote>
+<p>第一步：使用原数据解析器从原始16进制日志中提取消息类型ID和发行版本。</p>
+<p>第二步：在(type-ID, release)元组上通过切换分支来选择对应的消息解析器。<strong>根据不同协议的标准提取消息格式</strong>。</p>
+<p>处理协议依赖性：实现了协议配置存储库</p>
+<blockquote>
+<p><strong>如何满足低延迟的要求并减少系统开销？</strong></p>
+</blockquote>
+<p>按需收集：只存储设备指定分析器所需的日志</p>
+<p>按需解码：只解码必需字段</p>
+<p>并行日志收集和解析：代理通过内存中的队列传递原始日志，可防止日志收集阻塞分析     </p>
+<img src="https://pic.downk.cc/item/5f7d2fac1cd1bbb86b4fd949.jpg" style="zoom: 50%;" />
+
+<h3 id="根据MobileInsight组成，再讲Analyzer部分"><a href="#根据MobileInsight组成，再讲Analyzer部分" class="headerlink" title="根据MobileInsight组成，再讲Analyzer部分"></a>根据MobileInsight组成，再讲Analyzer部分</h3><p>不同协议行为具有2个维度：</p>
+<p>(1) 协议状态动态：包括协议状态和状态转换事件，受标准化协议状态机制和运行时对协议消息及配置的观察控制。可提供有关性能（例如，RRC中的高/低速率连接状态）和功能正确性（例如，移动性管理或会话管理中的故障状态）的直接提示。</p>
+<p>(2) 协议操作逻辑：它决定使用哪些参数以及发送/接收哪些消息。对于以网络为中心的3G / 4G设计，它是网络运营商用来确定协议使用的参数/消息的算法或策略。</p>
+<blockquote>
+<p><strong>提取协议状态动态</strong></p>
+</blockquote>
+<p>我们首先基于3GPP标准为每个协议导出<strong>参考状态机模型</strong>，模型根据蜂窝消息抽象出设备侧状态和转换条件。 然后将运行时蜂窝消息从我们的设备内监视器喂入该模型(提供了确切的协议状态和状态相关的配置)。 从蜂窝消息中，<strong>通过参考状态机来导出转换参数并跟踪状态转换</strong>。 由于标准化状态机和运行时消息在MobileInsight中是已知的，故可获取运行时协议状态的基本信息。</p>
+<p>移动性管理(可用于故障诊断和安全漏洞检测)、会话管理(用作网络性能和网络故障诊断的提示)</p>
+<blockquote>
+<p><strong>推断协议操作逻辑</strong></p>
+</blockquote>
+<p>将网络操作建模为有限状态机，并设计了一种在线推理算法。采用了QSM这一状态合并算法，该算法在AI中使用了蜂窝网络领域特有知识以提高推理精度。    </p>
+<p>在线推理分为：样品收集、部分恢复和聚合</p>
+<img src="https://pic.downk.cc/item/5f7ebf251cd1bbb86baf068d.jpg" style="zoom: 50%;" />
+
+<h3 id="MobileInsight具体实现"><a href="#MobileInsight具体实现" class="headerlink" title="MobileInsight具体实现"></a>MobileInsight具体实现</h3><h3 id="评估"><a href="#评估" class="headerlink" title="评估"></a>评估</h3><p>(1) 设备内支持和广泛覆盖性：设备内支持、广泛的覆盖范围和蜂窝信息的特点</p>
+<p>(2) 响应性和有效性：消息监控率、处理时间、提取协议状态动态的有效性、推断操作逻辑的有效性</p>
+<p>(3) 系统开销：CPU和内存、电量消耗、存储空间开销</p>
+<h3 id="举3个例证明其应用"><a href="#举3个例证明其应用" class="headerlink" title="举3个例证明其应用"></a>举3个例证明其应用</h3><p>(1) 网络故障诊断</p>
+<p>NetDiag：控制平面诊断工具，通过追溯蜂窝事件、报告时间序列，提供了错误触发原因的操作日志，提示网络故障原因</p>
+<p>(2) 安全漏洞检测：检测移动设备和蜂窝基站间的信令/数据是否得到了加密和完整性保护。</p>
+<p>检查注册过程中的身份验证状态以及安全模式命令中指定的加密/完整性保护算法。如果身份验证失败或加密/完整性算法未被激活，则报告一个漏洞</p>
+<p>(3) 性能提升：a handoff advisor</p>
+<h3 id="相关工作"><a href="#相关工作" class="headerlink" title="相关工作"></a>相关工作</h3><h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><h2 id="知识点"><a href="#知识点" class="headerlink" title="知识点"></a>知识点</h2><blockquote>
+<p><strong>蜂窝协议栈</strong></p>
+</blockquote>
+<p>分为三部分：</p>
+<p>(1) 第一部分使设备和基站之间的无线电接入成为可能。实现了物理(L1)和链路(L2)功能，包括PHY、MAC、RLC(无线电链路控制)和PDCP(分组数据收敛协议)。</p>
+<p>(2) 控制层协议。分为接入层AS和非接入层NAS。</p>
+<p>AS协议通过无线电资源控制(RRC)来调节无线电访问。RRC主要用于无线电资源分配和无线电连接管理;它也有助于传递信令信息。</p>
+<p>NAS负责在设备和核心网络之间传递非无线电信令消息。移动管理协议(MM)和会话管理协议(SM)也属于控制平面。MM为呼叫/数据会话提供位置更新和移动支持，而SM用于创建和强制语音呼叫和数据会话。</p>
+<p>(3) 位于IP层上的数据平面。不是特定于蜂窝网络的，而是使用标准的TCP/IP套件。</p>
+<p><img src="https://pic.downk.cc/item/5f7c7e0a160a154a670448dd.jpg"></p>
+<blockquote>
+<p><strong>RRC无线资源控制</strong></p>
+</blockquote>
+<p>RRC、DRX等介绍：<a href="http://blog.sina.com.cn/s/blog_49f62c350102yi6w.html">http://blog.sina.com.cn/s/blog_49f62c350102yi6w.html</a></p>
+<blockquote>
+<p><strong>QoS服务质量</strong></p>
+</blockquote>
+<p>参考：<a href="https://blog.csdn.net/pansaky/article/details/84946362">https://blog.csdn.net/pansaky/article/details/84946362</a> + <a href="https://blog.csdn.net/qq_38265137/article/details/80466737">https://blog.csdn.net/qq_38265137/article/details/80466737</a></p>
+<p>QoS（Quality ofService，服务质量）是一种可以为不同类型业务流提供差分（即“不同”）服务等级的技术。通过QoS可以给那些对带宽、时延、时延抖动、丢包率等敏感的业务流提供更加优先的服务等级，使业务能满足用户正常、高性能使用的需求。可实现的主要功能包括流量监管（对进入接口的，超出限制速率的报文进行丢弃）、流量整形（对接口发送的，超出限制速率的报文先进行缓存，等待流量不超出速率时发送）、拥塞避免（在出现网络拥塞时对符合条件的报文进行丢弃）、拥塞管理（在出现网络拥塞时采用队列调度的方法对符合条件的队列中的报文优先发送）、流策略（可根据不同的流分类实现诸如禁止/允许通过，重标记报文优先级、重标记报文VLAN标签、重定向流量、过滤报文、流量镜像、启用流量统计功能等行为）。</p>
+<p>三种QoS服务模型：</p>
+<p><strong>1、Best Effort模型</strong></p>
+<p>Best Effort（尽力而为）模型是一种为所有业务流提供相同服务等级的服务模型，也是最简单的服务模型。在Best Effort模型中，应用程序可以在任何时候发出任意数量的报文，而且不需要事先获得批准，也不需要通知网络，网络尽最大的可能性发送每一个数据报文，但对时延、可靠性等性能不提供任何保证。Best Effort模型是Internet的缺省服务模型，它适用于绝大多数网络，如FTP、Email等，通过先进先出（FIFO）调度方式来实现。</p>
+<p><strong>2、IntServ模型</strong></p>
+<p>IntServ（IntegratedService，综合服务）模型的主要特点是在发送报文前要先向网络提出申请。这个请求是通过协议信令来完成的，如RSVP（Resource Reservation Protocol，资源预留协议）。应用程序首先通过RSVP信令通知网络它的QoS需求（如时延、带宽、丢包率等指标），在收到资源预留请求后，传送路径上的网络节点实施许可控制（Admission control），验证用户的合法性并检查资源的可用性，决定是否为应用程序预留资源。一旦认可并为应用程序的报文分配了资源，则只要应用程序的报文控制在流量参数描述的范围内，网络节点将承若满足应用程序的QoS需求。传输路径上的网路节点可以通过执行报文的分类、流量监管、低延迟的排队调度等行为，来满足对应程序的承诺。</p>
+<p> IntServ模型常与组播应用结合，使用于需要保证带宽、低延迟的实时多媒体应用，如电视会议、视频点播等。当前，采用RSVP协议的IntServ模型定义了两种业务类型：<br>(1) 保证型服务（GuaranteedService）：提供保证的带宽和时延限制来满足应用程序的要求。如VoIP应用可预留10MB带宽和要求不超过1s的时延<br>(2) 负载控制型服务（Controlled-LoadService）：保证即使在网络过载（overload）的情况下，仍能对报文提供类似Best Effort模型在未过载时的服务质量，保证某些应用程序报文的低时延和低丢包率需求</p>
+<p>IntServ模型的最大优点是可以提供端到端的QoS传输服务，最大缺点是可扩展性不好：网络节点需要为每个资源预留维护一些必要的软状态（Soft State）信息；在与组播应用相结合时，还要定期地向网络发资源请求和路径刷新信息，以支持组播成员的动态加入和退出。而这些操作要耗费网络节点较多的处理时间和内存资源。在网络规模扩大时，维护的开销幅度增加，对网络节点特别是核心节点线速处理报文的性能造成严重影响。因此IntServ模型不适宜于在流量汇集的骨干网上大量应用。</p>
+<p><strong>3、DiffServ模型</strong></p>
+<p>为了在Internet上针对不同的业务提供有差别的服务，IETF定义了DiffServ（Differentiated Service，差分服务）模型。</p>
+<p>DiffServ模型是一种多服务模型，可以满足不同用户业务流的QoS需求。它与IntServ模型不同的是应用程序在发出报文前通过设置报文头部的优先级字段，向网络中各设备通告自己的QoS需求，而不需要通知途径的网络设备为其预留资源，网络不需要为每个流维护状态，仅根据每个报文携带的优先级就可确定所需为对应流提供的服务等级。</p>
+<p>DiffServ模型一般用来为一些重要的应用提供端到端的QoS。通常在配置DiffServ模型后，边界设备通过报文的源地址和目的地址等信息对报文进行分类，对不同的报文设置不同的优先级，并标记在报文头部，而其他设备只需要根据设置的优先级来进行报文的调度。</p>
+<p>在DiffServ模型中，流分类、流量监管、流量整形、拥塞管理和拥塞避免是对不同类型报文提供有区别服务的基石，它们主要完成如下功能：<br>(1) 流分类：依据一定的匹配规则识别出不同类型的报文，是有区别地实施服务的前提。<br>(2) 流量监管：对进入交换机的特定流量的规格进行监管。当流量超出规格时，可以采取限制或惩罚措施，以保护运营商的商业利益和网络资源不受损害。<br>(3) 流量整形：一种主动调整流的输出速率的措施，使流量适配下游交换机可供给的网络资源，避免不必要的报文丢弃和拥塞。<br>(4) 拥塞管理：在发生网络拥塞时必须采取解决资源竞争的措施。通常是将报文放入队列缓存，并采取某种调度算法安排报文的转发次序。<br>(5) 拥塞避免：过渡的拥塞会对网络资源造成损害。拥塞避免功能可以监督网络资源的使用情况，在发现拥塞有加剧的趋势时采取主动丢弃报文的策略，通过调整流量措施来解除网络的过载。</p>
+<p> 在这些功能组件中：流分类是基础，它依据一定的匹配规则识别出报文，是有区别地实施服务的前提；流量监管、流量整形、拥塞管理和拥塞避免从不同方面对网络流量及其分配的资源实施控制，是有区别的提供服务具体体现。</p>
+]]></content>
+      <categories>
+        <category>论文学习</category>
+      </categories>
+      <tags>
+        <tag>论文学习</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Hello World</title>
     <url>/Sakura617.github.io/2020/10/12/hello-world/</url>
     <content><![CDATA[<p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
@@ -18,13 +276,10 @@
 <p>More info: <a href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
 ]]></content>
       <categories>
-        <category>cate</category>
-        <category>sub_cate</category>
-        <category>sub_sub_cate</category>
+        <category>保研</category>
       </categories>
       <tags>
-        <tag>tag1</tag>
-        <tag>tag2</tag>
+        <tag>保研</tag>
       </tags>
   </entry>
 </search>
